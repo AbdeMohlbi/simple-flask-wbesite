@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: orange;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .sales-section,
+        .manage-accounts-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sales-section h2,
+        .manage-accounts-section h2 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background: #0073e6;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #ddd;
+        }
+
+        button {
+            background: #0073e6;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #005bb5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Admin Dashboard</h1>
+        </header>
+        <section class="sales-section">
+            <h2>Sales Overview</h2>
+            <p>Total Sales: {{ total_sales }}</p>
+        </section>
+        <section class="manage-accounts-section">
+            <h2>Manage Accounts</h2>
+            <form id="update-form">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>
+                                <p align="center" class="client-id">{{ client.idClient }}</p>
+                            </td>
+                            <td>
+                                <input type="text" name="clientname" value="{{ client.clientName }}" required>
+                            </td>
+                            <td>
+                                <input type="text" name="clientPassword" value="{{ client.clientPassword }}" required>
+                            </td>
+                            <td>
+                                <button type="button" onclick="saveRow(this)">Save</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        function saveRow(button) {
+            const row = button.closest('tr');
+            const data = {
+                id: row.querySelector('.client-id').textContent, 
+                clientname: row.querySelector('input[name="clientname"]').value,
+                clientPassword: row.querySelector('input[name="clientPassword"]').value
+            };
+
+            // Send data to the backend using Fetch API
+            fetch('/update_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('User updated successfully');
+                    } else {
+                        alert('Error updating user');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update user.');
+                });
+        }
+    </script>
+</body>
+
+</html>
